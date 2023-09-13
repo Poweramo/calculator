@@ -1,5 +1,3 @@
-// !!! Solving decimal point problem
-
 const calculator = document.querySelector(".calculator");
 const screen = document.querySelector("input");
 
@@ -24,15 +22,18 @@ const items = [
 
 let numbers;
 let result;
-// let lastItem = screen.value[screen.value.length - 1];
 
 let regex1 = /\+/g;
 let regex2 = /\-/g;
 let regex3 = /\*/g;
 let regex4 = /\÷/g;
-let regex5 = /\.$/g;
-let regex6 = /\./g;
 
+const error = () => {
+	screen.value = "Error";
+	setTimeout(() => {
+		screen.value = "";
+	}, 1500);
+};
 const add = (x, y) => {
 	result = x + y;
 };
@@ -61,28 +62,6 @@ calculator.addEventListener("click", (e) => {
 		) {
 			return "Error";
 		} else if (screen.value.endsWith(".") === true) {
-			return "Error";
-		} else {
-			screen.value += e.target.id;
-		}
-	};
-
-	const decimalPointRules = () => {
-		if (screen.value.match(regex5)) {
-			return "Error";
-		} else if (
-			screen.value.endsWith("+") === true ||
-			screen.value.endsWith("-") === true ||
-			screen.value.endsWith("*") === true ||
-			screen.value.endsWith("÷") === true
-		) {
-			return "Error";
-		} else if (
-			(!screen.value.match(regex1) && screen.value.match(regex6)) ||
-			(!screen.value.match(regex2) && screen.value.match(regex6)) ||
-			(!screen.value.match(regex3) && screen.value.match(regex6)) ||
-			(!screen.value.match(regex4) && screen.value.match(regex6))
-		) {
 			return "Error";
 		} else {
 			screen.value += e.target.id;
@@ -127,7 +106,17 @@ calculator.addEventListener("click", (e) => {
 			screen.value += e.target.id;
 			break;
 		case items[12]:
-			return "Error";
+			if (
+				screen.value.endsWith("+") === true ||
+				screen.value.endsWith("-") === true ||
+				screen.value.endsWith("*") === true ||
+				screen.value.endsWith("÷") === true ||
+				screen.value.endsWith(".") === true
+			) {
+				return "Error";
+			} else {
+				screen.value += e.target.id;
+			}
 			break;
 		case items[13]:
 			screen.value += e.target.id;
@@ -142,21 +131,29 @@ calculator.addEventListener("click", (e) => {
 				.replaceAll("÷", "+")
 				.split("+");
 			numbers = [Number(numbers[0]), Number(numbers[1])];
+
 			if (screen.value.match(regex1)) {
 				add(numbers[0], numbers[1]);
 				screen.value = result;
 			}
+
 			if (screen.value.match(regex2)) {
 				substract(numbers[0], numbers[1]);
 				screen.value = result;
 			}
+
 			if (screen.value.match(regex3)) {
 				multiply(numbers[0], numbers[1]);
 				screen.value = result;
 			}
+
 			if (screen.value.match(regex4)) {
 				divide(numbers[0], numbers[1]);
 				screen.value = result;
+			}
+
+			if (screen.value === "NaN") {
+				error();
 			}
 			break;
 	}

@@ -1,9 +1,6 @@
-/* TODO: Make input value unselectable */
-
 * {
 	margin: 0;
 	padding: 0;
-	color: red;
 }
 
 body {
@@ -47,7 +44,6 @@ input:focus {
 	padding: 8px;
 	padding-top: 0;
 	border: 5px solid rgb(97, 160, 162, 0.7);
-	/* border-radius: 15%; */
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr 1fr;
 	grid-template-rows: 1fr 1fr 1fr 1fr;
@@ -73,6 +69,3 @@ input:focus {
 .buttons:hover {
 	background: linear-gradient(90deg, rgba(3, 64, 120, 1) 0%, rgba(0, 31, 84, 1) 68%);
 }
-
-/* @media screen and (max-width: ) {
-} */
