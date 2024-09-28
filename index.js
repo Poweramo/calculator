@@ -1,13 +1,13 @@
-// TODO: fix calculation for negative numbers
+// TODO: fix calculation for decimal numbers
 // TODO: change / to ÷
 // TODO: add clear button
-// TODO: add tests to fix bugs
+// TODO: fix calculator regex (++ or -- or // or ** are accepted)
+// TODO: fix division by 0
 
 const calculator = document.querySelector(".calculator");
 const screen = document.querySelector("input");
 const calculatorBtns = calculator.children
 let calculatorRegex = /^[-+]?(\d+|(\d*[\.]?\d+))([-+*\/]+[-+]?(\d+|(\d*[\.]?\d+)))*$/
-let numbers;
 
 function add(x, y) {
         return x + y;
@@ -30,54 +30,51 @@ function error() {
 };
 
 function calculate(exp) {
-	const priorOpStack = []
-        const opStack = []
-        const priorNumsStack = []
-        const numsStack = []
-        let lastOp = ""
-        let currNum = ""
-        let res;
+    const results = [];
+    const waitingList = []
+    let currNum = ""
+    let currOp = ""
 
-        for (let i = 0; i < exp.length; i++) {
-                if (isNaN(Number(exp[i]))) {
-                        const num = Number(currNum)
-                        if (exp[i] === "+" || exp[i] === "-") {
-                                opStack.push(exp[i])
-                                numsStack.push(num)
-                        }
-                        if (exp[i] === "*" || exp[i] === "/") {
-                                priorOpStack.push(exp[i])
-                                priorNumsStack.push(num)
-                        }
+    for (let i = 0; i < exp.length; i++) {
+        if (!isNaN(Number(exp[i]))) {
+            currNum += exp[i]
 
-                        lastOp = exp[i]
-                        currNum = ""
-                        continue;
+            if (isNaN(Number(exp[i + 1]))) {
+                const secondNum = Number(currNum)
+                currNum = ""
+
+                if (results.length === 0) {
+                    results.push(secondNum)
+                    continue;
                 }
-                currNum += exp[i]
+
+                if (currOp === "*" || currOp === "/") {
+                    const firstNum = results.pop()
+                    if (currOp === "*") results.push(multiply(firstNum, secondNum))
+                    if (currOp === "/") results.push(divide(firstNum, secondNum))
+                } else {
+                    results.push(secondNum)
+                    waitingList.push(currOp)
+                }
+            }
+        } else {
+            currOp = exp[i]
         }
-        if (lastOp === "+" || lastOp === "-") numsStack.push(Number(currNum))
-        if (lastOp === "*" || lastOp === "/") priorNumsStack.push(Number(currNum))
+    }
 
-        while (priorNumsStack.length !== 0) {
-                const operator = priorOpStack.pop()
-                const secondNum = priorNumsStack.pop()
-                const firstNum = res || priorNumsStack.pop()
+    while (results.length > 1) {
+        const operator = waitingList.shift()
+        const firstNum = results.shift()
+        const secondNum = results.shift()
 
-                if (operator === "*") res = multiply(firstNum, secondNum)
-                if (operator === "/") res = divide(firstNum, secondNum)
-        }
-	while (numsStack.length !== 0) {
-                const operator = opStack.pop()
-                const secondNum = numsStack.pop()
-                const firstNum = res || numsStack.pop()
+        if (operator === "+") results.unshift(add(firstNum, secondNum))
+        if (operator === "-") results.unshift(substract(firstNum, secondNum))
+        if (operator === "*") results.unshift(multiply(firstNum, secondNum))
+        if (operator === "/") results.unshift(divide(firstNum, secondNum))
+    }
 
-                if (operator === "+") res = add(firstNum, secondNum)
-                if (operator === "-") res = substract(firstNum, secondNum)
-        }
-
-        return res;
-}
+    return results[0];
+};
 
 for (let btn of calculatorBtns) {
 	btn.addEventListener("click", () => {
